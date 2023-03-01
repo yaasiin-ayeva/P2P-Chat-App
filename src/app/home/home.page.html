@@ -1,0 +1,89 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Chat
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div id="app">
+    <div id="login" *ngIf="screen === 'login'">
+      <div class="container">
+        <h1>Enter your username</h1>
+        <div class="row">
+          <ion-row nowrap>
+            <ion-item>
+              <ion-input type="text" [(ngModel)]="usernameInput" placeholder="Enter your username"></ion-input>
+            </ion-item>
+            <ion-button (click)="login()">Login</ion-button>
+          </ion-row>
+        </div>
+        <p *ngIf="loading">Loading...</p>
+        <p *ngIf="peerError" style="color: red">{{ peerError }}</p>
+      </div>
+    </div>
+
+    <div id="chat" *ngIf="screen === 'chat'">
+      <div class="container">
+        <h1>Multichat</h1>
+        <p>Your username: {{ usernameInput }}</p>
+      </div>
+
+      <div class="row">
+        <div id="users" class="col s12 m5">
+          <div class="row">
+            <!-- We don't show connection form if the client is disconnected -->
+            <div *ngIf="!peer.disconnected; else elseBlock">
+
+              <ion-row nowrap>
+                <ion-item>
+                  <ion-input :disabled="{{loading}}" id="target_id" type="text" type="text" [(ngModel)]="targetIdInput"
+                    placeholder="Target username"></ion-input>
+                </ion-item>
+                <ion-button :disabled="{{loading}}" (click)="submitConnection()">Connect</ion-button>
+              </ion-row>
+              <ion-button :disabled="{{loading}}" (click)="disconnectPeer()">Disconnect from
+                server</ion-button>
+              <div class="col s12">
+                <em *ngIf="peerError" style="color: red">{{ peerError }}</em>
+              </div>
+            </div>
+            <ng-template #elseBlock>
+              <div class="container">
+                <h5>You are disconnected!</h5>
+                <em>
+                  You can still talk to connected users, but won't be able to reach or be reached by any new user!
+                </em>
+              </div>
+            </ng-template>
+
+            <div class="col s12">
+              <h4>Connected users</h4>
+              <p>portrait: {{ usernameInput }}</p>
+              <p *ngFor="let peerId of peerIds">
+                portrait: {{ getUsername(peerId) }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col s12 m7">
+          <h4>Chatbox</h4>
+          <div id="chatbox" *ngFor="let chat of chats">
+            <p>{{ chat.sender }}: {{ chat.message }}</p>
+          </div>
+          <div class="row">
+            <ion-row nowrap>
+              <ion-item>
+                <ion-input id="chat_message" type="text" type="text" [(ngModel)]="chatMessageInput"
+                  placeholder="Your message"></ion-input>
+              </ion-item>
+              <ion-button (click)="submitChat()">Send</ion-button>
+            </ion-row>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>
