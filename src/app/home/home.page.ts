@@ -16,13 +16,13 @@ export class HomePage {
 
   screen: SCREEN = SCREEN.LOGIN;
 
-  appPrefix!: string;
+  appPrefix: string = "yaasiin-secure-p2p-multichat-"; // the prefix we will preprend to usernames;
   oldChats: any;
   chats: any[] = [];
 
   loading: boolean = false;
   peerError: string = '';
-  usernameInput: string = 'A';
+  usernameInput: string = '';
 
   peerId: string = 'login';
   chat: any;
@@ -36,8 +36,6 @@ export class HomePage {
   options: PeerJSOption;
 
   constructor(private storage: Storage) {
-    this.appPrefix = "yaasiin-secure-p2p-multichat-"; // the prefix we will preprend to usernames
-
     this.options = {
       config: {
         iceServers: [

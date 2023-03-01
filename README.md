@@ -1,6 +1,8 @@
 # p2p-chat-app
 Simple, Secure & Persistent chat application using peer-to-peer service offered by peerJS libraries made with ionic capacitor, using angular
 
+Inspired by <a href="https://github.com/Rubilmax/peerjs-multichat.git" target="_blank">
+
 # Steps to run this project:
 
 1. Run :
@@ -10,12 +12,12 @@ npm i
 
 2. Finally Run : 
 ```bash
-ionic serve --host [YOUR_IP_ADDRESS] --ssl
+ionic serve --ssl
 ```
 
 3. You can test the app inside two browsers or two tabs in the same browser. Try to access this link
 ```bash
-https://[YOUR_API_ADDRESS]:[SERVER_PORT]/home
+https://localhost:[SERVER_PORT]/home
 ```
 
 ## Important !
