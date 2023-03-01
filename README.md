@@ -1,5 +1,5 @@
 # p2p-chat-app
-Simple chat application using pee-to-peer service offered by peerJS (WebRTC) libraries made with ionic capacitor, using angular
+Simple, Secure & Persistent chat application using peer-to-peer service offered by peerJS libraries made with ionic capacitor, using angular
 
 # Steps to run this project:
 
