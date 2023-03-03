@@ -46,22 +46,7 @@ export class HomePage {
               'stun:stun1.l.google.com:19302',
               'stun:stun2.l.google.com:19302',
             ]
-          },
-          {
-            urls: "turn:relay.metered.ca:80",
-            username: "fd53a7b7c7efba23a43de395",
-            credential: "kev5FGXr7qpZtj1O",
-          },
-          {
-            urls: "turn:relay.metered.ca:443",
-            username: "fd53a7b7c7efba23a43de395",
-            credential: "kev5FGXr7qpZtj1O",
-          },
-          {
-            urls: "turn:relay.metered.ca:443?transport=tcp",
-            username: "fd53a7b7c7efba23a43de395",
-            credential: "kev5FGXr7qpZtj1O",
-          },
+          }
         ],
       },
       debug: 3
@@ -229,7 +214,7 @@ export class HomePage {
 
   submitChat() {
     if (this.chatMessageInput.length > 0) {
-      
+
       const chat: Chat = new Chat(this.currentUser, this.recipient, this.chatMessageInput);
       this.receiveChat(chat); // simulate receiving a chat
 
