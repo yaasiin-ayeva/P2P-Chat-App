@@ -23,9 +23,10 @@ export class HomePage {
 
   loading: boolean = false;
   peerError: string = '';
-  usernameInput: string = '';
+  currentUser: string = '';
+  recipient: string = '';
 
-  peerId: string = 'login';
+  peerId: string = '';
   chat: any;
 
   peer: any = {};
@@ -74,25 +75,25 @@ export class HomePage {
       this.oldChats = chats;
       this.chats = this.oldChats ? JSON.parse(this.oldChats) : []; // oldChats may be undefined, which throws error if passed into JSON.parse
     });
-
+    
     await this.storage.get("username").then((username) => {
-      this.usernameInput = username;
+      this.currentUser = username;
       this.chats = this.oldChats ? JSON.parse(this.oldChats) : []; // oldChats may be undefined, which throws error if passed into JSON.parse
     });
   }
 
-  login() {
-    if (this.usernameInput.length > 0 && !this.loading) {
+  async login() {
+    if (this.currentUser.length > 0 && !this.loading) {
       this.loading = true; // update status
       this.peerError = ""; // reset error status
-      this.storage.set("username", this.usernameInput); // set username cookie to instanciate it at the next session
+      this.storage.set("username", this.currentUser); // set username cookie to instanciate it at the next session
       this.createPeer();
     }
   }
 
   createPeer() {
     // options are useful in development to connect to local peerjs server
-    this.peer = new Peer(this.getPeerId(this.usernameInput), this.options);
+    this.peer = new Peer(this.getPeerId(this.currentUser), this.options);
 
     // when peer is connected to signaling server
     this.peer.on("open", () => {
@@ -109,13 +110,14 @@ export class HomePage {
         this.targetIdInput = "";
       } else if (error.type === "unavailable-id") { // if requested id (thus username) is already taken
         this.loading = false;
-        this.peerError = `${this.usernameInput} is already taken!`; // custom error message
+        this.peerError = `${this.currentUser} is already taken!`; // custom error message
       } else this.peerError = error; // default error message
     });
 
     // when peer receives a connection
     this.peer.on('connection', (conn: any) => {
       if (!this.peerIds.includes(conn.peer)) {
+        this.recipient = this.getUsername(conn.peer);
         this.configureConnection(conn);
 
         conn.on("open", () => {
@@ -193,6 +195,8 @@ export class HomePage {
 
       console.log(`Connecting to ${peerId}...`);
 
+      this.recipient = this.getUsername(peerId);
+
       const options = {
         metadata: {
           // if the caller has peers, we send them to merge calls
@@ -225,16 +229,13 @@ export class HomePage {
 
   submitChat() {
     if (this.chatMessageInput.length > 0) {
-
-      const message_receiver = this.getUsername(this.peerId);
-      const chat: Chat = new Chat(this.usernameInput, message_receiver, this.chatMessageInput);
-      console.log('chat : ', chat);
-
+      
+      const chat: Chat = new Chat(this.currentUser, this.recipient, this.chatMessageInput);
       this.receiveChat(chat); // simulate receiving a chat
 
       // Send chat message to specific receiver or all connected users depending on the broadcast
       Object.values(this.connections).forEach((conn: any) => {
-        if (chat.broadcast || this.getUsername(conn.peerId) === chat.receiver) {
+        if (chat.isBroadCast() || this.getUsername(conn.peer) === chat.receiver) {
           conn.send({
             type: "chat",
             chat
