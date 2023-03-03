@@ -24,7 +24,7 @@ export class HomePage {
   loading: boolean = false;
   peerError: string = '';
   currentUser: string = '';
-  receiverUser: string = '';
+  recipient: string = '';
 
   peerId: string = '';
   chat: any;
@@ -75,14 +75,14 @@ export class HomePage {
       this.oldChats = chats;
       this.chats = this.oldChats ? JSON.parse(this.oldChats) : []; // oldChats may be undefined, which throws error if passed into JSON.parse
     });
-
+    
     await this.storage.get("username").then((username) => {
       this.currentUser = username;
       this.chats = this.oldChats ? JSON.parse(this.oldChats) : []; // oldChats may be undefined, which throws error if passed into JSON.parse
     });
   }
 
-  login() {
+  async login() {
     if (this.currentUser.length > 0 && !this.loading) {
       this.loading = true; // update status
       this.peerError = ""; // reset error status
@@ -117,7 +117,7 @@ export class HomePage {
     // when peer receives a connection
     this.peer.on('connection', (conn: any) => {
       if (!this.peerIds.includes(conn.peer)) {
-        this.receiverUser = this.getUsername(conn.peer);
+        this.recipient = this.getUsername(conn.peer);
         this.configureConnection(conn);
 
         conn.on("open", () => {
@@ -195,7 +195,7 @@ export class HomePage {
 
       console.log(`Connecting to ${peerId}...`);
 
-      this.receiverUser = this.getUsername(peerId);
+      this.recipient = this.getUsername(peerId);
 
       const options = {
         metadata: {
@@ -229,15 +229,13 @@ export class HomePage {
 
   submitChat() {
     if (this.chatMessageInput.length > 0) {
-
-      const chat: Chat = new Chat(this.currentUser, this.receiverUser, this.chatMessageInput);
-      console.log('chat : ', chat);
-
+      
+      const chat: Chat = new Chat(this.currentUser, this.recipient, this.chatMessageInput);
       this.receiveChat(chat); // simulate receiving a chat
 
       // Send chat message to specific receiver or all connected users depending on the broadcast
       Object.values(this.connections).forEach((conn: any) => {
-        if (chat.isBroadCast() || this.getUsername(conn.peerId) === chat.receiver) {
+        if (chat.isBroadCast() || this.getUsername(conn.peer) === chat.receiver) {
           conn.send({
             type: "chat",
             chat
