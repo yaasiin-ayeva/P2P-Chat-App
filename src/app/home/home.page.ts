@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage-angular';
 import { Peer, PeerJSOption } from 'peerjs';
+import { environment } from 'src/environments/environment';
 import Chat from 'src/models/chat.model';
 
 export enum SCREEN {
@@ -38,19 +39,7 @@ export class HomePage {
   options: PeerJSOption;
 
   constructor(private storage: Storage) {
-    this.options = {
-      config: {
-        iceServers: [
-          {
-            urls: [
-              'stun:stun1.l.google.com:19302',
-              'stun:stun2.l.google.com:19302',
-            ]
-          }
-        ],
-      },
-      debug: 3
-    };
+    this.options = environment.peerServerOpt;
   }
 
   async ngOnInit() {
@@ -60,7 +49,7 @@ export class HomePage {
       this.oldChats = chats;
       this.chats = this.oldChats ? JSON.parse(this.oldChats) : []; // oldChats may be undefined, which throws error if passed into JSON.parse
     });
-    
+
     await this.storage.get("username").then((username) => {
       this.currentUser = username;
       this.chats = this.oldChats ? JSON.parse(this.oldChats) : []; // oldChats may be undefined, which throws error if passed into JSON.parse
@@ -89,14 +78,7 @@ export class HomePage {
 
     // error listener
     this.peer.on("error", (error: any) => {
-      if (error.type === "peer-unavailable") { // if connection with new peer can't be established
-        this.loading = false;
-        this.peerError = `${this.targetIdInput} is unreachable!`; // custom error message
-        this.targetIdInput = "";
-      } else if (error.type === "unavailable-id") { // if requested id (thus username) is already taken
-        this.loading = false;
-        this.peerError = `${this.currentUser} is already taken!`; // custom error message
-      } else this.peerError = error; // default error message
+      this.handlePeerError(error);
     });
 
     // when peer receives a connection
@@ -228,6 +210,22 @@ export class HomePage {
         }
       });
       this.chatMessageInput = ""; // reset chat message input
+    }
+  }
+
+  handlePeerError(error: any): void {
+    if (error.type === "peer-unavailable") { // if connection with new peer can't be established
+      this.loading = false;
+      this.peerError = `${this.targetIdInput} is unreachable!`; // custom error message
+      this.targetIdInput = "";
+      console.log('PeerError: ', this.peerError);
+    } else if (error.type === "unavailable-id") { // if requested id (thus username) is already taken
+      this.loading = false;
+      this.peerError = `${this.currentUser} is already taken!`; // custom error message
+      console.log('PeerError: ', this.peerError);
+    } else {
+      this.peerError = error; // default error message
+      console.log('PeerError: ', this.peerError);
     }
   }
 }
