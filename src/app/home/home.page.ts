@@ -219,7 +219,7 @@ export class HomePage {
 
   receiveChat(chat: any) {
     this.chats.push(chat);
-    localStorage.setItem("chats", JSON.stringify(this.chats));
+    this.storage.set("chats", JSON.stringify(this.chats));
   }
 
   submitChat() {
