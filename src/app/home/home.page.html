@@ -14,7 +14,7 @@
         <div class="row">
           <ion-row nowrap>
             <ion-item>
-              <ion-input type="text" [(ngModel)]="usernameInput" placeholder="Enter your username"></ion-input>
+              <ion-input type="text" [(ngModel)]="currentUser" placeholder="Enter your username"></ion-input>
             </ion-item>
             <ion-button (click)="login()">Login</ion-button>
           </ion-row>
@@ -27,7 +27,7 @@
     <div id="chat" *ngIf="screen === 'chat'">
       <div class="container">
         <h1>Multichat</h1>
-        <p>Your username: {{ usernameInput }}</p>
+        <p>Your username: {{ currentUser }}</p>
       </div>
 
       <div class="row">
@@ -60,7 +60,7 @@
 
             <div class="col s12">
               <h4>Connected users</h4>
-              <p>portrait: {{ usernameInput }}</p>
+              <p>portrait: {{ currentUser }}</p>
               <p *ngFor="let peerId of peerIds">
                 portrait: {{ getUsername(peerId) }}
               </p>
