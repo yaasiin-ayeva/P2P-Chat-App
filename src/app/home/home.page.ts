@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage-angular';
 import { Peer, PeerJSOption } from 'peerjs';
+import Chat from 'src/models/chat.model';
 
 export enum SCREEN {
   'LOGIN' = 'login',
@@ -16,7 +17,7 @@ export class HomePage {
 
   screen: SCREEN = SCREEN.LOGIN;
 
-  appPrefix: string = "yaasiin-secure-p2p-multichat-"; // the prefix we will preprend to usernames;
+  appPrefix: string = "synk-11-secure-p2p-multichat-"; // the prefix we will preprend to usernames;
   oldChats: any;
   chats: any[] = [];
 
@@ -224,22 +225,22 @@ export class HomePage {
 
   submitChat() {
     if (this.chatMessageInput.length > 0) {
-      // the chat object's data
-      const chat = {
-        sender: this.usernameInput,
-        message: this.chatMessageInput,
-        timestamp: new Date().getTime()
-      };
+
+      const message_receiver = this.getUsername(this.peerId);
+      const chat: Chat = new Chat(this.usernameInput, message_receiver, this.chatMessageInput);
+      console.log('chat : ', chat);
 
       this.receiveChat(chat); // simulate receiving a chat
-      // send chat object to connected users
-      Object.values(this.connections).forEach((conn: any) => {
-        conn.send({
-          type: "chat",
-          chat
-        });
-      });
 
+      // Send chat message to specific receiver or all connected users depending on the broadcast
+      Object.values(this.connections).forEach((conn: any) => {
+        if (chat.broadcast || this.getUsername(conn.peerId) === chat.receiver) {
+          conn.send({
+            type: "chat",
+            chat
+          });
+        }
+      });
       this.chatMessageInput = ""; // reset chat message input
     }
   }
